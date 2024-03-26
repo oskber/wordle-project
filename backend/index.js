@@ -2,8 +2,10 @@ import express from 'express';
 
 const app = express();
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
+const words = ['hello', 'world', 'foo', 'bar', 'baz'];
+
+app.get('/api/words', (req, res) => {
+  res.json({ words });
 });
 
 app.listen(5080);
