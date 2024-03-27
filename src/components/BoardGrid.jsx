@@ -1,3 +1,5 @@
+import React from 'react';
+
 import BoardRow from './BoardRow';
 
 export default function Board({ length, letters }) {
