@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 
-export default function LettersLength({ onSelectLength }) {
-  const [selectedValue, setSelectedValue] = useState(3);
-
+export default function LettersLength({ onSelectLength, selectedValue }) {
   const handleChange = (event) => {
-    setSelectedValue(event.target.value);
     onSelectLength(Number(event.target.value));
   };
 

@@ -1,15 +1,20 @@
+import fetchWords from './api/apiAdapter.js';
 import express from 'express';
+import fs from 'fs/promises';
 
 const app = express();
+app.use(express.json());
 
-const words = ['hello', 'world', 'foo', 'bar', 'baz'];
+/* app.get('/', async (req, res) => {
+  const html = await fs.readFile('../dist/index.html');
+  res.type('html').send(html);
+}); */
 
-app.get('/api/words', (req, res) => {
-  res.json({ words });
+app.get('/api/words', async (req, res) => {
+  const words = await fetchWords();
+  res.status(200).json(words);
 });
 
-app.get('/api/highscore', (req, res) => {
-  res.json({ highscore: 0 });
-});
+// app.use('/assets', express.static('../dist/assets'));
 
 app.listen(5080);

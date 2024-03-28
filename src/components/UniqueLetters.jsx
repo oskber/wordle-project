@@ -1,10 +1,6 @@
-import React, { useState } from 'react';
-
-export default function UniqueLetters() {
-  const [selectedValue, setSelectedValue] = useState('');
-
+export default function UniqueLetters({ selectedValue, onSelectUnique }) {
   const handleChange = (event) => {
-    setSelectedValue(event.target.value);
+    onSelectUnique(event.target.value);
   };
 
   return (
@@ -17,9 +13,6 @@ export default function UniqueLetters() {
           value={selectedValue}
           onChange={handleChange}
           className="w-20 rounded-[7px] border border-blue-gray-200 bg-transparent px-3 py-2.5 pr-1 font-sans text-sm font-normal text-blue-gray-700">
-          <option value="Choose" disabled hidden>
-            Do you want unique letters?
-          </option>
           <option value="true">Yes</option>
           <option value="false">No</option>
         </select>
