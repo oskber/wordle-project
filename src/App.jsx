@@ -4,33 +4,32 @@ import BoardGrid from './components/BoardGrid';
 import GuessInput from './components/GuessInput';
 import LettersLength from './components/LettersLength';
 import UniqueLetters from './components/UniqueLetters';
-import StartGame from './components/StartGame';
 
 function App() {
-  const [selectedLength, setSelectedLength] = useState(3);
-  const [selectedUnique, setSelectedUnique] = useState(true);
-  const [selectedValue, setSelectedValue] = useState('true');
+  const [selectedLength, setSelectedLength] = useState(5);
+  const [uniqueLetters, setUniqueLetters] = useState(true);
   const [letters, setLetters] = useState([]);
   const [currentRowIndex, setCurrentRowIndex] = useState(0);
-  const [correctWord, setCorrectWord] = useState('');
-  const [wordList, setWordList] = useState({});
+  const [correctWord, setCorrectWord] = useState([]);
+  const [originalWordList, setOriginalWordList] = useState({});
+  const [filteredWordList, setFilteredWordList] = useState({});
 
   useEffect(() => {
     async function fetchWords() {
       const response = await fetch('/api/words');
 
       const payload = await response.json();
-      setWordList(payload);
+      setOriginalWordList(payload);
     }
 
     fetchWords();
   }, []);
 
   useEffect(() => {
-    if (wordList.length > 0) {
-      handleSelectUnique(wordList, length);
+    if (originalWordList.length > 0) {
+      handleSelectUnique(originalWordList, length);
     }
-  }, [wordList]);
+  }, [originalWordList]);
 
   useEffect(() => {
     setLetters([]);
@@ -38,19 +37,27 @@ function App() {
   }, [selectedLength]);
 
   function handleSelectedLength(selectedLength) {
+    const filteredListByLength = originalWordList.words.filter(
+      (word) => word.length === selectedLength
+    );
     setSelectedLength(selectedLength);
+    setFilteredWordList({ words: filteredListByLength });
+    handleRandomWord(selectedLength, uniqueLetters);
   }
 
   function handleOnGuess(text) {
-    if (!text || text.match(/[0-9]/)) return;
-    const onGuess = text.split('');
-    const feedback = handleOnFeedback(onGuess, correctWord);
-    setLetters((prevLetters) => {
-      const newLetters = [...prevLetters];
-      newLetters[currentRowIndex] = feedback;
-      return newLetters;
-    });
-    setCurrentRowIndex(currentRowIndex + 1);
+    if (text.match(/[A-Z]/)) {
+      const onGuess = text.split('');
+      const feedback = handleOnFeedback(onGuess, correctWord);
+      setLetters((prevLetters) => {
+        const newLetters = [...prevLetters];
+        newLetters[currentRowIndex] = feedback;
+        return newLetters;
+      });
+      setCurrentRowIndex(currentRowIndex + 1);
+    } else {
+      return;
+    }
   }
 
   function handleOnFeedback(text) {
@@ -74,30 +81,49 @@ function App() {
         result.push({ letter: text[i], result: 'incorrect' });
       }
     }
+    console.log('result: ', result);
     return result;
   }
 
-  function handleSelectUnique(selectedValue) {
-    if (selectedValue === 'true') {
-      const updatedWords = wordList.words.filter(
+  function handleSelectUnique(uniqueLetters) {
+    if (uniqueLetters === true) {
+      const updatedWords = originalWordList.words.filter(
         (word) => new Set(word).size === word.length
       );
-      setSelectedValue(true);
-      setSelectedUnique(true);
-      setWordList({ words: updatedWords });
-    } else {
-      setSelectedValue(false);
-      setSelectedUnique(false);
-      setWordList({ words: wordList.words });
+      setUniqueLetters(true);
+      setFilteredWordList({ words: updatedWords });
+      handleRandomWord();
     }
   }
 
-  function handleRandomWord() {
-    const randomIndex = Math.floor(Math.random() * wordList.words.length);
-    const randomWord = wordList.words[randomIndex].split('');
-    console.log('randomWord: ', randomWord);
-    setCorrectWord(randomWord);
+  function handleRandomWord(selectedLength, uniqueLetters) {
+    const filteredWords = originalWordList.words.filter(
+      (word) =>
+        word.length === selectedLength &&
+        (uniqueLetters === true ? new Set(word).size === word.length : true)
+    );
+
+    if (filteredWords.length > 0) {
+      const randomIndex = Math.floor(Math.random() * filteredWords.length);
+      const randomWord = filteredWords[randomIndex].toUpperCase().split('');
+      setCorrectWord(randomWord);
+    } else {
+      console.log('No words of the selected length and uniqueness');
+    }
   }
+
+  //CONSOLE LOGS
+  useEffect(() => {
+    console.log('original: ', originalWordList);
+  }, [originalWordList]);
+  useEffect(() => {
+    console.log('filtered: ', filteredWordList);
+  }, [filteredWordList]);
+  useEffect(() => {
+    console.log('correctword: ', correctWord);
+  }, [correctWord]);
+
+  //END CONSOLE LOGS
 
   return (
     <div className="App">
@@ -108,15 +134,11 @@ function App() {
           selectedValue={selectedLength}
         />
         <UniqueLetters
-          onSelectedValue={selectedValue}
+          onSelectedValue={uniqueLetters}
           onSelectUnique={handleSelectUnique}
         />
       </div>
-      <StartGame
-        onStart={handleRandomWord}
-        onUnique={handleSelectUnique}
-        selectedLength={handleSelectedLength}
-      />
+
       <GuessInput
         onGuessInput={handleOnGuess}
         selectedLength={selectedLength}
