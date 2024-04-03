@@ -13,8 +13,8 @@ export default function UniqueLetters({ uniqueLetters, onSelectUnique }) {
           value={uniqueLetters}
           onChange={handleChange}
           className="w-20 rounded-[7px] border border-blue-gray-200 bg-transparent px-3 py-2.5 pr-1 font-sans text-sm font-normal text-blue-gray-700">
-          <option value="true">Yes</option>
           <option value="false">No</option>
+          <option value="true">Yes</option>
         </select>
       </form>
     </div>
