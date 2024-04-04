@@ -1,9 +1,16 @@
+import { useEffect } from 'react';
+
 export default function GameOver({
   gameOver = {},
   correctWord,
   currentAttempt,
   onReset,
+  stopTime,
 }) {
+  useEffect(() => {
+    stopTime();
+  }, [stopTime]);
+
   return (
     <div className="gameOver">
       <h3>{gameOver.guessedWord ? 'Congrats!' : 'You failed...'}</h3>

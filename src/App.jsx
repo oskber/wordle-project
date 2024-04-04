@@ -21,6 +21,28 @@ function App() {
     gameOver: false,
     guessedWord: false,
   });
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+
+  const startTime = () => {
+    setIsRunning(true);
+  };
+  const stopTime = () => {
+    setIsRunning(false);
+  };
+
+  const hours = Math.floor(time / 360000);
+  const minutes = Math.floor((time % 360000) / 6000);
+  const seconds = Math.floor((time % 6000) / 100);
+  const milliseconds = time % 100;
+
+  useEffect(() => {
+    let intervalId;
+    if (isRunning) {
+      intervalId = setInterval(() => setTime(time + 1), 10);
+    }
+    return () => clearInterval(intervalId);
+  }, [isRunning, time]);
 
   useEffect(() => {
     async function fetchWords() {
@@ -32,17 +54,6 @@ function App() {
 
     fetchWords();
   }, []);
-
-  useEffect(() => {
-    function waitOnReset() {
-      setTimeout(() => {
-        console.log('waited 1 seconds');
-
-        handleRandomWord(selectedLength, uniqueLetters);
-      }, 1000);
-    }
-    waitOnReset();
-  }, [originalWordList]);
 
   useEffect(() => {
     if (originalWordList.length > 0) {
@@ -77,11 +88,9 @@ function App() {
       setCurrentAttempt({ attempt: currentAttempt.attempt + 1 });
 
       if (currentAttempt.attempt < 5 && guessedWord === correctWord.join('')) {
-        console.log('You guessed the word!');
         setGameOver({ gameOver: true, guessedWord: true });
         return;
       } else if (currentAttempt.attempt === 5) {
-        console.log('Game Over');
         setGameOver({ gameOver: true, guessedWord: false });
         setCurrentAttempt({ attempt: 0 });
         return;
@@ -118,12 +127,12 @@ function App() {
 
   function handleSelectUnique(uniqueLetters) {
     if (uniqueLetters === true) {
-      const updatedWords = originalWordList.words.filter(
+      const filteredListByUnique = originalWordList.words.filter(
         (word) => new Set(word).size === word.length
       );
       setUniqueLetters(true);
-      setFilteredWordList({ words: updatedWords });
-      handleRandomWord();
+      setFilteredWordList({ words: filteredListByUnique });
+      handleRandomWord(selectedLength, uniqueLetters);
     }
   }
 
@@ -148,6 +157,7 @@ function App() {
     setCurrentAttempt({ attempt: 0 });
     setCurrentRowIndex(0);
     setLetters([]);
+    setTime(0);
   }
 
   //CONSOLE LOGS
@@ -180,19 +190,27 @@ function App() {
           onSelectUnique={handleSelectUnique}
         />
       </div>
-
       <GuessInput
         onGuessInput={handleOnGuess}
         selectedLength={selectedLength}
         onFeedback={handleOnFeedback}
+        startTime={startTime}
       />
       <BoardGrid letters={letters} length={selectedLength} />
+      <div className="stopwatch-container">
+        <p className="stopwatch-time">
+          {hours}:{minutes.toString().padStart(2, '0')}:
+          {seconds.toString().padStart(2, '0')}:
+          {milliseconds.toString().padStart(2, '0')}
+        </p>
+      </div>{' '}
       {gameOver.gameOver ? (
         <GameOver
           gameOver={gameOver}
           correctWord={correctWord}
           currentAttempt={currentAttempt}
           onReset={handleOnReset}
+          stopTime={stopTime}
         />
       ) : null}
     </div>
@@ -200,3 +218,20 @@ function App() {
 }
 
 export default App;
+
+/* 
+<div className="stopwatch-container">
+      <p className="stopwatch-time">
+        {hours}:{minutes.toString().padStart(2, '0')}:
+        {seconds.toString().padStart(2, '0')}:
+        {milliseconds.toString().padStart(2, '0')}
+      </p>
+      <div className="stopwatch-buttons">
+        <button className="stopwatch-button" onClick={startAndStop}>
+          {isRunning ? 'Stop' : 'Start'}
+        </button>
+        <button className="stopwatch-button" onClick={reset}>
+          Reset
+        </button>
+      </div>
+    </div> */
