@@ -195,6 +195,7 @@ function App() {
         selectedLength={selectedLength}
         onFeedback={handleOnFeedback}
         startTime={startTime}
+        gameOver={gameOver}
       />
       <BoardGrid letters={letters} length={selectedLength} />
       <div className="stopwatch-container">
