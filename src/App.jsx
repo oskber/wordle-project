@@ -17,6 +17,7 @@ function App() {
   const [currentAttempt, setCurrentAttempt] = useState({
     attempt: 0,
   });
+  const [guessedWords, setGuessedWords] = useState([]);
   const [gameOver, setGameOver] = useState({
     gameOver: false,
     guessedWord: false,
@@ -31,10 +32,8 @@ function App() {
     setIsRunning(false);
   };
 
-  const hours = Math.floor(time / 360000);
   const minutes = Math.floor((time % 360000) / 6000);
   const seconds = Math.floor((time % 6000) / 100);
-  const milliseconds = time % 100;
 
   useEffect(() => {
     let intervalId;
@@ -55,11 +54,25 @@ function App() {
     fetchWords();
   }, []);
 
-  useEffect(() => {
-    if (originalWordList.length > 0) {
-      handleSelectUnique(originalWordList, length);
-    }
-  }, [originalWordList]);
+  async function createHighscoreItem(name) {
+    const newHighscoreItem = {
+      name: name,
+      guesses: guessedWords,
+      duration: `${minutes}:${seconds}`,
+      settings: {
+        uniqueLetters: uniqueLetters,
+        length: selectedLength,
+      },
+    };
+
+    await fetch('/api/leaderboard', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newHighscoreItem),
+    });
+  }
 
   useEffect(() => {
     setLetters([]);
@@ -70,13 +83,17 @@ function App() {
     const filteredListByLength = originalWordList.words.filter(
       (word) => word.length === selectedLength
     );
+    handleOnReset();
     setSelectedLength(selectedLength);
     setFilteredWordList({ words: filteredListByLength });
     handleRandomWord(selectedLength, uniqueLetters);
   }
 
   function handleOnGuess(guessedWord) {
-    if (guessedWord.match(/[A-Z]/)) {
+    const uppercaseWordlist = originalWordList.words.map((word) =>
+      word.toUpperCase()
+    );
+    if (guessedWord.match(/[A-Z]/) && uppercaseWordlist.includes(guessedWord)) {
       const onGuess = guessedWord.split('');
       const feedback = handleOnFeedback(onGuess, correctWord);
       setLetters((prevLetters) => {
@@ -85,7 +102,10 @@ function App() {
         return newLetters;
       });
       setCurrentRowIndex(currentRowIndex + 1);
-      setCurrentAttempt({ attempt: currentAttempt.attempt + 1 });
+      setCurrentAttempt({
+        attempt: currentAttempt.attempt + 1,
+      });
+      setGuessedWords([...guessedWords, guessedWord]);
 
       if (currentAttempt.attempt < 5 && guessedWord === correctWord.join('')) {
         setGameOver({ gameOver: true, guessedWord: true });
@@ -97,6 +117,8 @@ function App() {
       } else {
         return;
       }
+    } else {
+      alert('Please enter a valid word');
     }
   }
 
@@ -121,7 +143,6 @@ function App() {
         result.push({ letter: guessedWord[i], result: 'incorrect' });
       }
     }
-    console.log('result: ', result);
     return result;
   }
 
@@ -158,6 +179,7 @@ function App() {
     setCurrentRowIndex(0);
     setLetters([]);
     setTime(0);
+    setGuessedWords([]);
   }
 
   //CONSOLE LOGS
@@ -170,10 +192,6 @@ function App() {
   useEffect(() => {
     console.log('correctword: ', correctWord);
   }, [correctWord]);
-
-  useEffect(() => {
-    console.log('currentattempt: ', currentAttempt);
-  }, [currentAttempt]);
 
   //END CONSOLE LOGS
 
@@ -198,41 +216,22 @@ function App() {
         gameOver={gameOver}
       />
       <BoardGrid letters={letters} length={selectedLength} />
-      <div className="stopwatch-container">
-        <p className="stopwatch-time">
-          {hours}:{minutes.toString().padStart(2, '0')}:
-          {seconds.toString().padStart(2, '0')}:
-          {milliseconds.toString().padStart(2, '0')}
-        </p>
-      </div>{' '}
       {gameOver.gameOver ? (
-        <GameOver
-          gameOver={gameOver}
-          correctWord={correctWord}
-          currentAttempt={currentAttempt}
-          onReset={handleOnReset}
-          stopTime={stopTime}
-        />
+        <>
+          <GameOver
+            gameOver={gameOver}
+            correctWord={correctWord}
+            currentAttempt={currentAttempt}
+            onReset={handleOnReset}
+            stopTime={stopTime}
+            seconds={seconds}
+            minutes={minutes}
+            onCreateHighscoreItem={createHighscoreItem}
+          />
+        </>
       ) : null}
     </div>
   );
 }
 
 export default App;
-
-/* 
-<div className="stopwatch-container">
-      <p className="stopwatch-time">
-        {hours}:{minutes.toString().padStart(2, '0')}:
-        {seconds.toString().padStart(2, '0')}:
-        {milliseconds.toString().padStart(2, '0')}
-      </p>
-      <div className="stopwatch-buttons">
-        <button className="stopwatch-button" onClick={startAndStop}>
-          {isRunning ? 'Stop' : 'Start'}
-        </button>
-        <button className="stopwatch-button" onClick={reset}>
-          Reset
-        </button>
-      </div>
-    </div> */
