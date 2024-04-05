@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 
-export default function GuessInput({
-  onGuessInput,
-  selectedLength,
-  startTime,
-  gameOver,
-}) {
+export default function GuessInput({ onGuessInput, selectedLength, gameOver }) {
   const [text, setText] = useState('');
 
   return (
@@ -17,7 +12,6 @@ export default function GuessInput({
           if (text.length !== selectedLength) return setText('');
           onGuessInput(text);
           setText('');
-          startTime();
         }}>
         <button
           className="!absolute right-1 top-1 z-10 select-none rounded bg-blue-500 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-blue-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none"

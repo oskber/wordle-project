@@ -4,10 +4,22 @@ import BoardGrid from './components/BoardGrid';
 import GuessInput from './components/GuessInput';
 import LettersLength from './components/LettersLength';
 import UniqueLetters from './components/UniqueLetters';
-import GameOver from './components/GameOver';
-
+import Game from './components/Game';
 function App() {
-  const [selectedLength, setSelectedLength] = useState(5);
+  const [gameId, setGameId] = useState(null);
+
+  useEffect(() => {
+    const startGame = async () => {
+      const res = await fetch('http://localhost:5080/api/games', {
+        method: 'post',
+      });
+      const data = await res.json();
+      setGameId(data.id);
+    };
+
+    startGame();
+  }, []);
+  /* const [selectedLength, setSelectedLength] = useState(5);
   const [uniqueLetters, setUniqueLetters] = useState(false);
   const [letters, setLetters] = useState([]);
   const [currentRowIndex, setCurrentRowIndex] = useState(0);
@@ -22,26 +34,6 @@ function App() {
     gameOver: false,
     guessedWord: false,
   });
-  const [time, setTime] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-
-  const startTime = () => {
-    setIsRunning(true);
-  };
-  const stopTime = () => {
-    setIsRunning(false);
-  };
-
-  const minutes = Math.floor((time % 360000) / 6000);
-  const seconds = Math.floor((time % 6000) / 100);
-
-  useEffect(() => {
-    let intervalId;
-    if (isRunning) {
-      intervalId = setInterval(() => setTime(time + 1), 10);
-    }
-    return () => clearInterval(intervalId);
-  }, [isRunning, time]);
 
   useEffect(() => {
     async function fetchWords() {
@@ -52,13 +44,13 @@ function App() {
     }
 
     fetchWords();
-  }, []);
-
+  }, []); */
+  /*  
   async function createHighscoreItem(name) {
     const newHighscoreItem = {
       name: name,
       guesses: guessedWords,
-      duration: `${minutes}:${seconds}`,
+      duration: duration,
       settings: {
         uniqueLetters: uniqueLetters,
         length: selectedLength,
@@ -72,12 +64,7 @@ function App() {
       },
       body: JSON.stringify(newHighscoreItem),
     });
-  }
-
-  useEffect(() => {
-    setLetters([]);
-    setCurrentRowIndex(0);
-  }, [selectedLength]);
+  } 
 
   function handleSelectedLength(selectedLength) {
     const filteredListByLength = originalWordList.words.filter(
@@ -178,60 +165,35 @@ function App() {
     setCurrentAttempt({ attempt: 0 });
     setCurrentRowIndex(0);
     setLetters([]);
-    setTime(0);
     setGuessedWords([]);
   }
+  */
 
-  //CONSOLE LOGS
-  useEffect(() => {
-    console.log('original: ', originalWordList);
-  }, [originalWordList]);
-  useEffect(() => {
-    console.log('filtered: ', filteredWordList);
-  }, [filteredWordList]);
-  useEffect(() => {
-    console.log('correctword: ', correctWord);
-  }, [correctWord]);
-
-  //END CONSOLE LOGS
-
-  return (
-    <div className="App">
-      <h1 className="mb-5 font-bold text-3xl">Wordle</h1>
-      <div className="flex justify-center gap-5">
-        <LettersLength
-          onSelectLength={handleSelectedLength}
-          selectedValue={selectedLength}
-        />
-        <UniqueLetters
-          onSelectedValue={uniqueLetters}
-          onSelectUnique={handleSelectUnique}
-        />
-      </div>
-      <GuessInput
-        onGuessInput={handleOnGuess}
-        selectedLength={selectedLength}
-        onFeedback={handleOnFeedback}
-        startTime={startTime}
-        gameOver={gameOver}
-      />
-      <BoardGrid letters={letters} length={selectedLength} />
-      {gameOver.gameOver ? (
-        <>
-          <GameOver
-            gameOver={gameOver}
-            correctWord={correctWord}
-            currentAttempt={currentAttempt}
-            onReset={handleOnReset}
-            stopTime={stopTime}
-            seconds={seconds}
-            minutes={minutes}
-            onCreateHighscoreItem={createHighscoreItem}
+  if (gameId) {
+    return (
+      <div className="App">
+        <h1 className="mb-5 font-bold text-3xl">Wordle</h1>
+        <div className="flex justify-center gap-5">
+          <LettersLength
+            onSelectLength={handleSelectedLength}
+            selectedValue={selectedLength}
           />
-        </>
-      ) : null}
-    </div>
-  );
+          <UniqueLetters
+            onSelectedValue={uniqueLetters}
+            onSelectUnique={handleSelectUnique}
+          />
+        </div>
+        <GuessInput
+          onGuessInput={handleOnGuess}
+          selectedLength={selectedLength}
+          onFeedback={handleOnFeedback}
+        />
+        <BoardGrid letters={letters} length={selectedLength} />
+
+        {gameState === 'won' && <Game onReset={handleOnReset} />}
+      </div>
+    );
+  }
 }
 
 export default App;
