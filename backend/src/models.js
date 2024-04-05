@@ -4,21 +4,19 @@ const Highscore = mongoose.model('Highscore', {
   name: String,
   guesses: Array,
   duration: String,
-  settings: {
-    uniqueLetters: Boolean,
-    length: Number,
-  },
+  uniqueLetters: Boolean,
+  length: Number,
   id: String,
 });
 
 export { Highscore };
 
-const Games = mongoose.model('Games', {
-  correctWord: Array,
-  guessedWords: Array,
+const Game = mongoose.model('Game', {
+  correctWord: String,
+  guesses: Array,
   attempts: Number,
   id: String,
   startTime: Date,
 });
 
-export { Games };
+export { Game };

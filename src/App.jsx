@@ -5,13 +5,30 @@ import GuessInput from './components/GuessInput';
 import LettersLength from './components/LettersLength';
 import UniqueLetters from './components/UniqueLetters';
 import Game from './components/Game';
-function App() {
+function App({ gameState }) {
   const [gameId, setGameId] = useState(null);
+
+  const [selectedLength, setSelectedLength] = useState(5);
+  const [uniqueLetters, setUniqueLetters] = useState(false);
+  const [letters, setLetters] = useState([]);
+  const [currentRowIndex, setCurrentRowIndex] = useState(0);
+  const [correctWord, setCorrectWord] = useState([]);
+  const [currentAttempt, setCurrentAttempt] = useState({
+    attempt: 0,
+  });
+  const [guessedWords, setGuessedWords] = useState([]);
 
   useEffect(() => {
     const startGame = async () => {
       const res = await fetch('http://localhost:5080/api/games', {
         method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          uniqueLetters: true,
+          length: 5,
+        }),
       });
       const data = await res.json();
       setGameId(data.id);
@@ -19,67 +36,16 @@ function App() {
 
     startGame();
   }, []);
-  /* const [selectedLength, setSelectedLength] = useState(5);
-  const [uniqueLetters, setUniqueLetters] = useState(false);
-  const [letters, setLetters] = useState([]);
-  const [currentRowIndex, setCurrentRowIndex] = useState(0);
-  const [correctWord, setCorrectWord] = useState([]);
-  const [originalWordList, setOriginalWordList] = useState({});
-  const [filteredWordList, setFilteredWordList] = useState({});
-  const [currentAttempt, setCurrentAttempt] = useState({
-    attempt: 0,
-  });
-  const [guessedWords, setGuessedWords] = useState([]);
-  const [gameOver, setGameOver] = useState({
-    gameOver: false,
-    guessedWord: false,
-  });
-
-  useEffect(() => {
-    async function fetchWords() {
-      const response = await fetch('/api/words');
-
-      const payload = await response.json();
-      setOriginalWordList(payload);
-    }
-
-    fetchWords();
-  }, []); */
-  /*  
-  async function createHighscoreItem(name) {
-    const newHighscoreItem = {
-      name: name,
-      guesses: guessedWords,
-      duration: duration,
-      settings: {
-        uniqueLetters: uniqueLetters,
-        length: selectedLength,
-      },
-    };
-
-    await fetch('/api/leaderboard', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newHighscoreItem),
-    });
-  } 
-
   function handleSelectedLength(selectedLength) {
-    const filteredListByLength = originalWordList.words.filter(
+    const filteredListByLength = WORDS.filter(
       (word) => word.length === selectedLength
     );
     handleOnReset();
     setSelectedLength(selectedLength);
-    setFilteredWordList({ words: filteredListByLength });
-    handleRandomWord(selectedLength, uniqueLetters);
   }
 
   function handleOnGuess(guessedWord) {
-    const uppercaseWordlist = originalWordList.words.map((word) =>
-      word.toUpperCase()
-    );
+    const uppercaseWordlist = WORDS.map((word) => word.toUpperCase());
     if (guessedWord.match(/[A-Z]/) && uppercaseWordlist.includes(guessedWord)) {
       const onGuess = guessedWord.split('');
       const feedback = handleOnFeedback(onGuess, correctWord);
@@ -95,10 +61,8 @@ function App() {
       setGuessedWords([...guessedWords, guessedWord]);
 
       if (currentAttempt.attempt < 5 && guessedWord === correctWord.join('')) {
-        setGameOver({ gameOver: true, guessedWord: true });
         return;
       } else if (currentAttempt.attempt === 5) {
-        setGameOver({ gameOver: true, guessedWord: false });
         setCurrentAttempt({ attempt: 0 });
         return;
       } else {
@@ -133,43 +97,14 @@ function App() {
     return result;
   }
 
-  function handleSelectUnique(uniqueLetters) {
-    if (uniqueLetters === true) {
-      const filteredListByUnique = originalWordList.words.filter(
-        (word) => new Set(word).size === word.length
-      );
-      setUniqueLetters(true);
-      setFilteredWordList({ words: filteredListByUnique });
-      handleRandomWord(selectedLength, uniqueLetters);
-    }
-  }
-
-  function handleRandomWord(selectedLength, uniqueLetters) {
-    const filteredWords = originalWordList.words.filter(
-      (word) =>
-        word.length === selectedLength &&
-        (uniqueLetters === true ? new Set(word).size === word.length : true)
-    );
-
-    if (filteredWords.length > 0) {
-      const randomIndex = Math.floor(Math.random() * filteredWords.length);
-      const randomWord = filteredWords[randomIndex].toUpperCase().split('');
-      setCorrectWord(randomWord);
-    } else {
-      console.log('No words of the selected length and uniqueness');
-    }
-  }
-
   function handleOnReset() {
-    setGameOver({ gameOver: false, guessedWord: false });
     setCurrentAttempt({ attempt: 0 });
     setCurrentRowIndex(0);
     setLetters([]);
     setGuessedWords([]);
   }
-  */
 
-  if (gameId) {
+  if (!gameId) {
     return (
       <div className="App">
         <h1 className="mb-5 font-bold text-3xl">Wordle</h1>
@@ -178,10 +113,7 @@ function App() {
             onSelectLength={handleSelectedLength}
             selectedValue={selectedLength}
           />
-          <UniqueLetters
-            onSelectedValue={uniqueLetters}
-            onSelectUnique={handleSelectUnique}
-          />
+          <UniqueLetters onSelectedValue={uniqueLetters} />
         </div>
         <GuessInput
           onGuessInput={handleOnGuess}
@@ -193,6 +125,8 @@ function App() {
         {gameState === 'won' && <Game onReset={handleOnReset} />}
       </div>
     );
+  } else {
+    return <div>Loading...</div>;
   }
 }
 

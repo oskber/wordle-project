@@ -1,9 +1,4 @@
 import useState from 'react';
-import BoardGrid from './BoardGrid';
-import BoardTile from './BoardTile';
-import GuessInput from './GuessInput';
-import UniqueLetters from './UniqueLetters';
-import LettersLength from './LettersLength';
 
 export default function Game({ gameId }) {
   const [gameState, setGameState] = useState('playing');
@@ -16,13 +11,16 @@ export default function Game({ gameId }) {
     if (keyCode === 'Enter') {
       setInputText('');
 
-      const res = await fetch(`/api/games/${gameId}/guesses`, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ guess: inputText }),
-      });
+      const res = await fetch(
+        `http://localhost:5080/api/games/${gameId}/guesses`,
+        {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ guess: inputText }),
+        }
+      );
 
       const data = await res.json();
 

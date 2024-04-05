@@ -1,9 +1,13 @@
 import fs from 'fs/promises';
 
-export default async function getRandomWord() {
+async function getRandomWord() {
   const payload = await fs.readFile('./data/words_dictionary.json');
-  const WORDS = JSON.parse(payload.toString());
+  const data = JSON.parse(payload.toString());
+  const WORDS = data.words;
   const randomIndex = Math.floor(Math.random() * WORDS.length);
-  const randomWord = WORDS[randomIndex].toUpperCase().split('');
+  const randomWord = WORDS[randomIndex].toUpperCase();
+  console.log(randomWord);
   return randomWord;
 }
+
+export { getRandomWord };
