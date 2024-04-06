@@ -3,6 +3,9 @@ import React, { useState } from 'react';
 export default function GuessInput({ onGuessInput, selectedLength }) {
   const [text, setText] = useState('');
 
+  const handleChange = (event) => {
+    setText(event.target.value);
+  };
   return (
     <div className="flex flex-row justify-center items-center gap-1 mb-3">
       <form
@@ -24,9 +27,7 @@ export default function GuessInput({ onGuessInput, selectedLength }) {
           placeholder=" "
           type="text"
           value={text}
-          onChange={(ev) => {
-            setText(ev.target.value.toUpperCase());
-          }}
+          onChange={handleChange}
           maxLength={selectedLength}
           minLength={selectedLength}
         />

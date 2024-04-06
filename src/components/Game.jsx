@@ -1,15 +1,19 @@
-import useState from 'react';
+import React, { useState } from 'react';
 import { handleOnGuess } from '../../backend/src/utils';
 
-export default function Game({ gameId }) {
+export default function Game({
+  gameId,
+  selectedLength,
+  setSelectedLength,
+  uniqueLetters,
+  setUniqueLetters,
+}) {
   const [gameState, setGameState] = useState('playing');
   const [inputText, setInputText] = useState('');
   const [guesses, setGuesses] = useState([]);
   const [result, setResult] = useState(null);
   const [name, setName] = useState('');
-  const [selectedLength, setSelectedLength] = useState(5);
-  const [uniqueLetters, setUniqueLetters] = useState(false);
-  const [letters, setLetters] = useState([]);
+
   const [currentRowIndex, setCurrentRowIndex] = useState(0);
   const [currentAttempt, setCurrentAttempt] = useState({
     attempt: 0,
@@ -26,23 +30,21 @@ export default function Game({ gameId }) {
     if (keyCode === 'Enter') {
       setInputText('');
 
-      const res = await fetch(
-        `http://localhost:5080/api/games/${gameId}/guesses`,
-        {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            guess: inputText,
-            length: selectedLength,
-            uniqueLetters: uniqueLetters,
-          }),
-        }
-      );
+      const res = await fetch(`/api/games/${gameId}/guesses`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          guess: inputText,
+          length: selectedLength,
+          uniqueLetters: uniqueLetters,
+        }),
+      });
 
       const data = await res.json();
 
+      //function to fetch post(?) from backend/src/utils.js
       handleOnGuess(data.guesses);
 
       setLetters((prevLetters) => [...prevLetters, data.guesses]);
@@ -68,7 +70,7 @@ export default function Game({ gameId }) {
       name,
     };
 
-    await fetch(`http://localhost:5080/api/games/${gameId}/highscore`, {
+    await fetch(`/api/games/${gameId}/highscore`, {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',

@@ -12,7 +12,7 @@ app.use(express.json());
 
 app.post('/api/games', async (req, res) => {
   const game = {
-    correctWord: await getRandomWord(),
+    correctWord: await getRandomWord(req.body.length, req.body.uniqueLetters),
     guesses: [],
     attempts: 0,
     uniqueLetters: req.body.uniqueLetters,
@@ -23,6 +23,8 @@ app.post('/api/games', async (req, res) => {
   console.log(game);
   const gameModel = new Game(game);
   await gameModel.save();
+
+  res.status(201).json({ id: game.id });
 });
 
 app.get('/api/games/:id/guesses', async (req, res) => {

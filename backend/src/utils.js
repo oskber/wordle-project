@@ -1,27 +1,22 @@
 import fs from 'fs/promises';
 
-async function getRandomWord(selectedLength, uniqueLetters) {
+async function getRandomWord(length, uniqueLetters) {
   const payload = await fs.readFile('./data/words_dictionary.json');
   const data = JSON.parse(payload.toString());
-  const WORDS = data.words;
+  let words = data.words;
 
-  if (selectedLength) {
-    const filteredListByLength = WORDS.filter(
-      (word) => word.length === selectedLength
-    );
-
-    WORDS = filteredListByLength;
+  if (length) {
+    words = words.filter((word) => word.length === Number(length));
   }
 
-  if (uniqueLetters === true) {
-    const filteredListByUniqueLetters = WORDS.filter(
-      (word) => new Set(word).size === word.length
+  if (uniqueLetters === 'true') {
+    words = words.filter(
+      (word) => new Set(word.split('')).size === word.length
     );
-    WORDS = filteredListByUniqueLetters;
   }
 
-  const randomIndex = Math.floor(Math.random() * WORDS.length);
-  const randomWord = WORDS[randomIndex].toUpperCase();
+  const randomIndex = Math.floor(Math.random() * words.length);
+  const randomWord = words[randomIndex].toUpperCase();
   console.log(randomWord);
   return randomWord;
 }
