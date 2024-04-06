@@ -1,4 +1,5 @@
 import useState from 'react';
+import { handleOnGuess } from '../../backend/src/utils';
 
 export default function Game({ gameId }) {
   const [gameState, setGameState] = useState('playing');
@@ -6,6 +7,20 @@ export default function Game({ gameId }) {
   const [guesses, setGuesses] = useState([]);
   const [result, setResult] = useState(null);
   const [name, setName] = useState('');
+  const [selectedLength, setSelectedLength] = useState(5);
+  const [uniqueLetters, setUniqueLetters] = useState(false);
+  const [letters, setLetters] = useState([]);
+  const [currentRowIndex, setCurrentRowIndex] = useState(0);
+  const [currentAttempt, setCurrentAttempt] = useState({
+    attempt: 0,
+  });
+
+  function handleOnReset() {
+    setCurrentAttempt({ attempt: 0 });
+    setCurrentRowIndex(0);
+    setLetters([]);
+    setGuesses([]);
+  }
 
   const handleKeyUp = async (keyCode) => {
     if (keyCode === 'Enter') {
@@ -18,13 +33,26 @@ export default function Game({ gameId }) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ guess: inputText }),
+          body: JSON.stringify({
+            guess: inputText,
+            length: selectedLength,
+            uniqueLetters: uniqueLetters,
+          }),
         }
       );
 
       const data = await res.json();
 
+      handleOnGuess(data.guesses);
+
+      setLetters((prevLetters) => [...prevLetters, data.guesses]);
+      setCurrentRowIndex(currentRowIndex + 1);
+      setCurrentAttempt({
+        attempt: currentAttempt.attempt + 1,
+      });
+
       if (data.correct) {
+        console.log(data.guesses);
         setResult(data.result);
         setGameState('won');
       }
@@ -70,7 +98,7 @@ export default function Game({ gameId }) {
           <input type="submit" />
         </form>
         <button
-          onClick={() => onReset()}
+          onClick={() => onReset(handleOnReset)}
           className="select-none rounded bg-yellow-500 m-2 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-yellow-500/20 transition-all hover:shadow-lg hover:shadow-yellow-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-yellow-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none">
           reset
         </button>

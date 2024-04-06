@@ -15,6 +15,8 @@ const Game = mongoose.model('Game', {
   correctWord: String,
   guesses: Array,
   attempts: Number,
+  uniqueLetters: Boolean,
+  length: Number,
   id: String,
   startTime: Date,
 });

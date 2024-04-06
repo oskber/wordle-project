@@ -15,10 +15,8 @@ app.post('/api/games', async (req, res) => {
     correctWord: await getRandomWord(),
     guesses: [],
     attempts: 0,
-    settings: {
-      uniqueLetters: req.body.uniqueLetters,
-      length: req.body.length,
-    },
+    uniqueLetters: req.body.uniqueLetters,
+    length: req.body.length,
     id: uuid.v4(),
     startTime: new Date(),
   };
