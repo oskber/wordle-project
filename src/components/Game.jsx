@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { handleOnGuess } from '../../backend/src/utils';
+import React, { useEffect, useState } from 'react';
+import GuessInput from './GuessInput';
+import BoardGrid from './BoardGrid';
 
 export default function Game({
   gameId,
@@ -13,6 +14,7 @@ export default function Game({
   const [guesses, setGuesses] = useState([]);
   const [result, setResult] = useState(null);
   const [name, setName] = useState('');
+  const [letters, setLetters] = useState([]);
 
   const [currentRowIndex, setCurrentRowIndex] = useState(0);
   const [currentAttempt, setCurrentAttempt] = useState({
@@ -26,41 +28,31 @@ export default function Game({
     setGuesses([]);
   }
 
-  const handleKeyUp = async (keyCode) => {
-    if (keyCode === 'Enter') {
-      setInputText('');
+  const handleSubmitGuess = async (inputText) => {
+    setInputText('');
 
-      const res = await fetch(`/api/games/${gameId}/guesses`, {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          guess: inputText,
-          length: selectedLength,
-          uniqueLetters: uniqueLetters,
-        }),
-      });
+    const res = await fetch(`/api/games/${gameId}/guesses`, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        guess: inputText,
+        length: selectedLength,
+        uniqueLetters: uniqueLetters,
+      }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      //function to fetch post(?) from backend/src/utils.js
-      handleOnGuess(data.guesses);
-
-      setLetters((prevLetters) => [...prevLetters, data.guesses]);
-      setCurrentRowIndex(currentRowIndex + 1);
-      setCurrentAttempt({
-        attempt: currentAttempt.attempt + 1,
-      });
-
-      if (data.correct) {
-        console.log(data.guesses);
-        setResult(data.result);
-        setGameState('won');
-      }
-
-      setGuesses(data.guesses);
+    if (data.correct) {
+      console.log(data.guesses);
+      setResult(data.result);
+      setGameState('won');
     }
+
+    setGuesses((oldGuesses) => [...oldGuesses, inputText]);
+    setLetters(inputText.split(''));
   };
 
   const handleSubmit = async (ev) => {
@@ -116,16 +108,13 @@ export default function Game({
 
   return (
     <div className="Game">
-      <input
-        value={inputText}
-        onChange={(ev) => setInputText(ev.target.value)}
-        onKeyUp={(ev) => handleKeyUp(ev.code)}
+      <GuessInput
+        inputText={inputText}
+        setInputText={setInputText}
+        onWordLengthChange={selectedLength}
+        handleSubmitGuess={handleSubmitGuess}
       />
-      <ul>
-        {guesses.map((guess, index) => (
-          <li key={index}>{guess}</li>
-        ))}
-      </ul>
+      <BoardGrid letters={letters} length={selectedLength} />
     </div>
   );
 }

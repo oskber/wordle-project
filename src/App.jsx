@@ -10,8 +10,6 @@ function App({}) {
   const [gameId, setGameId] = useState(null);
   const [uniqueLetters, setUniqueLetters] = useState(false);
   const [selectedLength, setSelectedLength] = useState(5);
-  const [inputText, setInputText] = useState('');
-  const [letters, setLetters] = useState([]);
 
   useEffect(() => {
     const startGame = async () => {
@@ -52,13 +50,14 @@ function App({}) {
           <LettersLength onWordLengthChange={setSelectedLength} />
           <UniqueLetters onUniqueLettersChange={setUniqueLetters} />
         </div>
-        <GuessInput
-          onGuessInput={setInputText}
-          onWordLengthChange={selectedLength}
-        />
-        <BoardGrid letters={letters} length={selectedLength} />
 
-        <Game gameId={gameId} />
+        <Game
+          gameId={gameId}
+          selectedLength={selectedLength}
+          onWordLengthChange={setSelectedLength}
+          uniqueLetters={uniqueLetters}
+          onUniqueLettersChange={setUniqueLetters}
+        />
       </div>
     );
   } else {

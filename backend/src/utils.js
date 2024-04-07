@@ -25,23 +25,24 @@ export { getRandomWord };
 
 async function handleFeedback(guesses, correctWord) {
   const feedback = [];
+  let guess = guesses.split('');
+  let correct = correctWord.split('');
   let duplicateCounter = 0;
-  for (let i = 0; i < guesses.length; i++) {
-    if (correctWord[i] === guesses[i]) {
-      feedback.push({ letter: guesses[i], result: 'correct' });
-    } else if (correctWord.includes(guesses[i])) {
+  for (let i = 0; i < guess.length; i++) {
+    if (correct[i] === guess[i]) {
+      feedback.push({ letter: guess[i], result: 'correct' });
+    } else if (correct.includes(guess[i])) {
       if (
-        guesses.filter((char) => char === guesses[i]).length >
-        correctWord.filter((char) => char === guesses[i]).length +
-          duplicateCounter
+        guess.filter((char) => char === guess[i]).length >
+        correct.filter((char) => char === guess[i]).length + duplicateCounter
       ) {
         duplicateCounter++;
-        feedback.push({ letter: guesses[i], result: 'incorrect' });
+        feedback.push({ letter: guess[i], result: 'incorrect' });
       } else {
-        feedback.push({ letter: guesses[i], result: 'misplaced' });
+        feedback.push({ letter: guess[i], result: 'misplaced' });
       }
     } else {
-      feedback.push({ letter: guesses[i], result: 'incorrect' });
+      feedback.push({ letter: guess[i], result: 'incorrect' });
     }
   }
   return feedback;
@@ -49,10 +50,17 @@ async function handleFeedback(guesses, correctWord) {
 
 export { handleFeedback };
 
-function handleOnGuess(guesses) {
+async function handleOnGuess(guesses) {
+  if (typeof guesses !== 'string') {
+    throw new Error('guesses must be a string');
+  }
+
+  const payload = await fs.readFile('./data/words_dictionary.json');
+  const data = JSON.parse(payload.toString());
+  let words = data.words;
   const letters = [];
-  const WORDS = WORDS.map((word) => word);
-  if (guesses.match(/[A-Z]/) && WORDS.includes(guesses)) {
+  words.map((word) => word);
+  if (guesses.match(/[A-Z]/) && words.includes(guesses)) {
     letters.push(guesses.map((letter) => letter.toUpperCase()));
     return letters;
   } else {

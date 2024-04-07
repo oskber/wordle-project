@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { getRandomWord } from './utils.js';
+import { getRandomWord, handleFeedback, handleOnGuess } from './utils.js';
 import { Highscore, Game } from './models.js';
 import * as uuid from 'uuid';
 import fs from 'fs/promises';
@@ -27,25 +27,33 @@ app.post('/api/games', async (req, res) => {
   res.status(201).json({ id: game.id });
 });
 
-app.get('/api/games/:id/guesses', async (req, res) => {
-  const game = Game.find((savedGame) => savedGame.id === req.params.id);
+app.post('/api/games/:id/guesses', async (req, res) => {
+  const game = await Game.findOne({ id: req.params.id });
   if (game) {
     const guess = req.body.guess;
-    game.guesses.push(guess);
+    game.guesses.push({
+      guess,
+    });
 
-    if (guess === game.correctWord.join('')) {
+    const feedback = await handleFeedback(guess, game.correctWord);
+
+    if (guess === game.correctWord) {
       game.endTime = new Date();
       res.status(201).json({
         result: game,
         guesses: game.guesses,
         correct: true,
+        feedback,
+      });
+    } else {
+      res.status(201).json({
+        guesses: game.guesses,
+        correct: false,
+        feedback,
       });
     }
   } else {
-    res.status(201).json({
-      guesses: game.guesses,
-      correct: false,
-    });
+    res.status(404).end();
   }
 });
 
