@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const Highscore = mongoose.model('Highscore', {
   name: String,
   guesses: Array,
-  duration: String,
+  duration: Number,
   uniqueLetters: Boolean,
   length: Number,
   id: String,

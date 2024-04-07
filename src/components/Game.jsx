@@ -22,10 +22,6 @@ export default function Game({
     attempt: 0,
   });
 
-  useEffect(() => {
-    setFeedback([]);
-  }, [selectedLength, uniqueLetters]);
-
   const handleSubmitGuess = async (inputText) => {
     setInputText('');
 
@@ -84,7 +80,7 @@ export default function Game({
     return (
       <div className="game">
         <h1>Congrats!</h1>
-        <p>The correct word was {guesses.at(-1)}</p>
+        <p>The correct word was {guesses.at(-1).guess}</p>
         <p>Guesses: {guesses.length}</p>
         <p>Duration: {duration}s</p>
         <h2>Add to highscore</h2>
