@@ -51,13 +51,10 @@ async function handleFeedback(guesses, correctWord) {
 export { handleFeedback };
 
 async function handleOnGuess(guesses) {
-  if (typeof guesses !== 'string') {
-    throw new Error('guesses must be a string');
-  }
-
   const payload = await fs.readFile('./data/words_dictionary.json');
   const data = JSON.parse(payload.toString());
   let words = data.words;
+
   const letters = [];
   words.map((word) => word);
   if (guesses.match(/[A-Z]/) && words.includes(guesses)) {

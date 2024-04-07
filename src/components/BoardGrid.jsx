@@ -1,17 +1,20 @@
 import React from 'react';
-
 import BoardRow from './BoardRow';
 
-export default function Board({ selectedLength, letters = [] }) {
-  const rows = [1, 2, 3, 4, 5, 6];
+export default function Board({ selectedLength, letters, feedback, guesses }) {
+  const rows = Array.from(
+    { length: 6 },
+    (_, index) =>
+      guesses[index] || {
+        guess: ' '.repeat(selectedLength),
+        feedback: Array(selectedLength).fill({}),
+      }
+  );
+
   return (
     <div>
       {rows.map((row, index) => (
-        <BoardRow
-          key={index}
-          letters={letters[index] || []}
-          length={selectedLength}
-        />
+        <BoardRow key={index} guess={row.guess} feedback={row.feedback} />
       ))}
     </div>
   );

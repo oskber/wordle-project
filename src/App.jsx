@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import BoardGrid from './components/BoardGrid';
-import GuessInput from './components/GuessInput';
 import LettersLength from './components/LettersLength';
 import UniqueLetters from './components/UniqueLetters';
 import Game from './components/Game';
@@ -13,30 +11,19 @@ function App({}) {
 
   useEffect(() => {
     const startGame = async () => {
-      try {
-        const res = await fetch('/api/games', {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            length: selectedLength,
-            uniqueLetters: uniqueLetters,
-          }),
-        });
+      const res = await fetch('/api/games', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          length: selectedLength,
+          uniqueLetters: uniqueLetters,
+        }),
+      });
 
-        if (!res.ok) {
-          console.error(`Server responded with status ${res.status}`);
-          const errorBody = await res.text();
-          console.error(`Server responded with body ${errorBody}`);
-          return;
-        }
-
-        const data = await res.json();
-        setGameId(data.id);
-      } catch (error) {
-        console.error('Error:', error);
-      }
+      const data = await res.json();
+      setGameId(data.id);
     };
 
     startGame();

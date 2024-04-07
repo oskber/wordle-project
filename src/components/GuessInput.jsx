@@ -9,7 +9,6 @@ export default function GuessInput({
   const handleSubmit = (ev) => {
     ev.preventDefault();
     handleSubmitGuess(inputText);
-    console.log('Guess:', inputText);
   };
   return (
     <div className="flex flex-row justify-center items-center gap-1 mb-3">
@@ -27,7 +26,12 @@ export default function GuessInput({
           placeholder=" "
           type="text"
           value={inputText}
-          onChange={(ev) => setInputText(ev.target.value.toUpperCase())}
+          onChange={(ev) => {
+            const value = ev.target.value.toUpperCase();
+            if (value.length <= selectedLength) {
+              setInputText(value);
+            }
+          }}
           maxLength={selectedLength}
           minLength={selectedLength}
         />
