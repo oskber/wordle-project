@@ -21,7 +21,6 @@ export default function Game({
   const [currentAttempt, setCurrentAttempt] = useState({
     attempt: 0,
   });
-  const [endTime, setEndTime] = useState(null);
 
   const handleSubmitGuess = async (inputText) => {
     setInputText('');
@@ -75,12 +74,6 @@ export default function Game({
   };
 
   useEffect(() => {
-    if (gameState === 'won') {
-      setEndTime(new Date());
-    }
-  }, [gameState]);
-
-  useEffect(() => {
     // Reset game state when selectedLength or uniqueLetters changes
     setGuesses([]);
     setFeedback([]);
@@ -107,7 +100,8 @@ export default function Game({
 
       {gameState === 'won' &&
         (() => {
-          const duration = (endTime - new Date(result.startTime)) / 1000;
+          const duration =
+            (new Date(result.endTime) - new Date(result.startTime)) / 1000;
           return (
             <div className="game">
               <h1>Congrats!</h1>
@@ -121,7 +115,12 @@ export default function Game({
                   onChange={(ev) => setName(ev.target.value)}
                   placeholder="Your name"
                 />
-                <input type="submit" />
+                <button
+                  className="select-none rounded bg-blue-500 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-blue-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none"
+                  type="submit"
+                  data-ripple-light="true">
+                  Submit
+                </button>
               </form>
               <button
                 onClick={() => {

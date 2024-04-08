@@ -34,8 +34,6 @@ app.post('/api/games/:id/guesses', async (req, res) => {
     game.guesses.push(guess);
     game.attempts++;
     game.markModified('guesses');
-    console.log('guess: ', guess);
-    console.log('game.guesses: ', game.guesses);
 
     const feedback = await handleFeedback(guess, game.correctWord);
 
@@ -64,12 +62,15 @@ app.post('/api/games/:id/guesses', async (req, res) => {
 app.post('/api/games/:id/highscore', async (req, res) => {
   const game = await Game.findOne({ id: req.params.id });
   if (game) {
-    console.log(game);
+    console.log('game: ', game);
     const name = req.body.name;
-    const guesses = game.guesses.map((guessObject) => guessObject.guess);
+    const guesses = game.guesses.map((guessObject) =>
+      typeof guessObject === 'string' ? guessObject : guessObject.guess
+    );
     const highscoreData = { ...game._doc, name, guesses };
     const highscoreModel = new Highscore(highscoreData);
     await highscoreModel.save();
+    console.log('highscoreData: ', highscoreData);
     res.status(201).json({ highscore: highscoreData });
   } else {
     res.status(404).end();
