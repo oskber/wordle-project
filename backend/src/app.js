@@ -18,7 +18,6 @@ app.post('/api/games', async (req, res) => {
     uniqueLetters: req.body.uniqueLetters,
     length: req.body.length,
     id: uuid.v4(),
-    startTime: new Date(),
   };
   console.log('game: ', game);
   const gameModel = new Game(game);
@@ -35,12 +34,16 @@ app.post('/api/games/:id/guesses', async (req, res) => {
     game.attempts++;
     game.markModified('guesses');
 
-    const feedback = await handleFeedback(guess, game.correctWord);
-
+    if (game.attempts === 1) {
+      game.startTime = new Date();
+    }
     await game.save();
+
+    const feedback = await handleFeedback(guess, game.correctWord);
 
     if (guess === game.correctWord) {
       game.endTime = new Date();
+      await game.save();
       res.status(201).json({
         result: game,
         guesses: game.guesses,
@@ -67,7 +70,13 @@ app.post('/api/games/:id/highscore', async (req, res) => {
     const guesses = game.guesses.map((guessObject) =>
       typeof guessObject === 'string' ? guessObject : guessObject.guess
     );
-    const highscoreData = { ...game._doc, name, guesses };
+
+    await game.save();
+    const highscoreData = {
+      ...game._doc,
+      name,
+      guesses,
+    };
     const highscoreModel = new Highscore(highscoreData);
     await highscoreModel.save();
     console.log('highscoreData: ', highscoreData);
@@ -82,7 +91,10 @@ app.get('/api/highscores', async (req, res) => {
   res.json({
     highscores: highscores.map((entry) => ({
       ...entry,
-      duration: new Date(entry.endTime) - new Date(entry.startTime),
+      duration: entry.endTime
+        ? new Date(entry.endTime).getTime() -
+          new Date(entry.startTime).getTime()
+        : 0,
     })),
   });
 });

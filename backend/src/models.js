@@ -3,10 +3,11 @@ import mongoose from 'mongoose';
 const Highscore = mongoose.model('Highscore', {
   name: String,
   guesses: Array,
-  duration: Number,
   uniqueLetters: Boolean,
   length: Number,
   id: String,
+  startTime: Date,
+  endTime: Date,
 });
 
 export { Highscore };
@@ -19,6 +20,7 @@ const Game = mongoose.model('Game', {
   length: Number,
   id: String,
   startTime: Date,
+  endTime: Date,
 });
 
 export { Game };

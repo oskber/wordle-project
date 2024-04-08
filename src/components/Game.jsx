@@ -39,7 +39,6 @@ export default function Game({
 
     const data = await res.json();
 
-    console.log(data);
     if (data.correct) {
       setResult(data.result);
       setGameState('won');
