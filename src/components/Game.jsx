@@ -144,7 +144,6 @@ export default function Game({
       {currentAttempt.attempt > 5 && gameState !== 'won' && (
         <div className="game">
           <h1>Game over!</h1>
-          <p>The correct word was {result.correctWord}</p>
           <p>Reset and try again!</p>
           <button
             onClick={() => {
