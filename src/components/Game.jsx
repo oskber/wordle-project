@@ -61,7 +61,6 @@ export default function Game({
 
     const highscore = {
       name,
-      guesses,
     };
 
     await fetch(`/api/games/${gameId}/highscore`, {

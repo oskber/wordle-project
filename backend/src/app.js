@@ -20,7 +20,7 @@ app.post('/api/games', async (req, res) => {
     id: uuid.v4(),
     startTime: new Date(),
   };
-  console.log(game);
+  console.log('game: ', game);
   const gameModel = new Game(game);
   await gameModel.save();
 
@@ -32,8 +32,14 @@ app.post('/api/games/:id/guesses', async (req, res) => {
   if (game) {
     const guess = req.body.guess;
     game.guesses.push(guess);
+    game.attempts++;
+    game.markModified('guesses');
+    console.log('guess: ', guess);
+    console.log('game.guesses: ', game.guesses);
 
     const feedback = await handleFeedback(guess, game.correctWord);
+
+    await game.save();
 
     if (guess === game.correctWord) {
       game.endTime = new Date();
@@ -56,10 +62,12 @@ app.post('/api/games/:id/guesses', async (req, res) => {
 });
 
 app.post('/api/games/:id/highscore', async (req, res) => {
-  const game = Game.find((savedGame) => savedGame.id === req.params.id);
+  const game = await Game.findOne({ id: req.params.id });
   if (game) {
+    console.log(game);
     const name = req.body.name;
-    const highscoreData = { ...game, name, guesses };
+    const guesses = game.guesses.map((guessObject) => guessObject.guess);
+    const highscoreData = { ...game._doc, name, guesses };
     const highscoreModel = new Highscore(highscoreData);
     await highscoreModel.save();
     res.status(201).json({ highscore: highscoreData });

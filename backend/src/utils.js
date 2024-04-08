@@ -17,7 +17,6 @@ async function getRandomWord(length, uniqueLetters) {
 
   const randomIndex = Math.floor(Math.random() * words.length);
   const randomWord = words[randomIndex].toUpperCase();
-  console.log(randomWord);
   return randomWord;
 }
 
