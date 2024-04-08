@@ -8,6 +8,8 @@ export default function GuessInput({
 }) {
   const handleSubmit = (ev) => {
     ev.preventDefault();
+    if (inputText.length < selectedLength || inputText.length > selectedLength)
+      return;
     handleSubmitGuess(inputText);
   };
   return (

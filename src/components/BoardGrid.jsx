@@ -1,7 +1,7 @@
 import React from 'react';
 import BoardRow from './BoardRow';
 
-export default function Board({ selectedLength, letters, feedback, guesses }) {
+export default function Board({ selectedLength, guesses }) {
   const rows = Array.from(
     { length: 6 },
     (_, index) =>

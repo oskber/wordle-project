@@ -31,9 +31,7 @@ app.post('/api/games/:id/guesses', async (req, res) => {
   const game = await Game.findOne({ id: req.params.id });
   if (game) {
     const guess = req.body.guess;
-    game.guesses.push({
-      guess,
-    });
+    game.guesses.push(guess);
 
     const feedback = await handleFeedback(guess, game.correctWord);
 
@@ -61,7 +59,7 @@ app.post('/api/games/:id/highscore', async (req, res) => {
   const game = Game.find((savedGame) => savedGame.id === req.params.id);
   if (game) {
     const name = req.body.name;
-    const highscoreData = { ...game, name };
+    const highscoreData = { ...game, name, guesses };
     const highscoreModel = new Highscore(highscoreData);
     await highscoreModel.save();
     res.status(201).json({ highscore: highscoreData });

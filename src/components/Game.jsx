@@ -21,6 +21,7 @@ export default function Game({
   const [currentAttempt, setCurrentAttempt] = useState({
     attempt: 0,
   });
+  const [endTime, setEndTime] = useState(null);
 
   const handleSubmitGuess = async (inputText) => {
     setInputText('');
@@ -39,8 +40,8 @@ export default function Game({
 
     const data = await res.json();
 
+    console.log(data);
     if (data.correct) {
-      console.log(data.guesses);
       setResult(data.result);
       setGameState('won');
     }
@@ -50,17 +51,17 @@ export default function Game({
       { guess: inputText, feedback: data.feedback },
     ]);
     setFeedback(data.feedback);
-    console.log(data.feedback);
     setLetters(inputText.split(''));
     setCurrentRowIndex(currentRowIndex + 1);
     setCurrentAttempt({ attempt: currentAttempt.attempt + 1 });
   };
 
-  const handleSubmit = async (ev) => {
+  const handleSubmitHighscore = async (ev) => {
     ev.preventDefault();
 
     const highscore = {
       name,
+      guesses,
     };
 
     await fetch(`/api/games/${gameId}/highscore`, {
@@ -74,40 +75,21 @@ export default function Game({
     setGameState('end');
   };
 
-  if (gameState === 'won') {
-    const duration =
-      (new Date(result.endTime) - new Date(result.startTime)) / 1000;
-    return (
-      <div className="game">
-        <h1>Congrats!</h1>
-        <p>The correct word was {guesses.at(-1).guess}</p>
-        <p>Guesses: {guesses.length}</p>
-        <p>Duration: {duration}s</p>
-        <h2>Add to highscore</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            value={name}
-            onChange={(ev) => setName(ev.target.value)}
-            placeholder="Your name"
-          />
-          <input type="submit" />
-        </form>
-        <button
-          onClick={() => {
-            window.location.reload();
-          }}
-          className="select-none rounded bg-yellow-500 m-2 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-yellow-500/20 transition-all hover:shadow-lg hover:shadow-yellow-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-yellow-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none">
-          reset
-        </button>
-      </div>
-    );
-  } else if (gameState === 'end') {
-    return (
-      <div className="Game">
-        <h1>Done!</h1>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (gameState === 'won') {
+      setEndTime(new Date());
+    }
+  }, [gameState]);
+
+  useEffect(() => {
+    // Reset game state when selectedLength or uniqueLetters changes
+    setGuesses([]);
+    setFeedback([]);
+    setLetters([]);
+    setCurrentRowIndex(0);
+    setCurrentAttempt({ attempt: 0 });
+    setGameState('playing');
+  }, [selectedLength, uniqueLetters]);
 
   return (
     <div className="Game">
@@ -123,6 +105,61 @@ export default function Game({
         feedback={feedback}
         guesses={guesses}
       />
+
+      {gameState === 'won' &&
+        (() => {
+          const duration = (endTime - new Date(result.startTime)) / 1000;
+          return (
+            <div className="game">
+              <h1>Congrats!</h1>
+              <p>The correct word was {guesses.at(-1).guess}</p>
+              <p>Guesses: {guesses.length}</p>
+              <p>Duration: {duration} seconds</p>
+              <h2>Add to highscore</h2>
+              <form onSubmit={handleSubmitHighscore}>
+                <input
+                  value={name}
+                  onChange={(ev) => setName(ev.target.value)}
+                  placeholder="Your name"
+                />
+                <input type="submit" />
+              </form>
+              <button
+                onClick={() => {
+                  window.location.reload();
+                }}
+                className="select-none rounded bg-yellow-500 m-2 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-yellow-500/20 transition-all hover:shadow-lg hover:shadow-yellow-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-yellow-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none">
+                reset
+              </button>
+            </div>
+          );
+        })()}
+      {currentAttempt.attempt > 5 && gameState !== 'won' && (
+        <div className="game">
+          <h1>Game over!</h1>
+          <p>The correct word was {result.correctWord}</p>
+          <p>Reset and try again!</p>
+          <button
+            onClick={() => {
+              window.location.reload();
+            }}
+            className="select-none rounded bg-yellow-500 m-2 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-yellow-500/20 transition-all hover:shadow-lg hover:shadow-yellow-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-yellow-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none">
+            reset
+          </button>
+        </div>
+      )}
+      {gameState === 'end' && (
+        <div className="game">
+          <h1>Done!</h1>
+          <button
+            onClick={() => {
+              window.location.reload();
+            }}
+            className="select-none rounded bg-yellow-500 m-2 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-yellow-500/20 transition-all hover:shadow-lg hover:shadow-yellow-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-yellow-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none">
+            reset
+          </button>
+        </div>
+      )}
     </div>
   );
 }
