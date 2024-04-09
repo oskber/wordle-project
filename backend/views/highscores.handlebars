@@ -1,0 +1,29 @@
+<section>
+  <h1 class="tbl-h1">Highscores</h1>
+  <div class="tbl-header">
+    <table cellpadding="0" cellspacing="0" border="0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Duration</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  <div class="tbl-content">
+    <table cellpadding="0" cellspacing="0" border="0">
+      <tbody>
+        {{#each highscores}}
+        <tr>
+          <td>{{this.name}}</td>
+          <td>{{this.duration}} seconds</td>
+          <td>{{this.startTime}}</td>
+          <td>{{this.endTime}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</section>

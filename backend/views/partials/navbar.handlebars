@@ -1,0 +1,11 @@
+<div>
+  <nav class="navbar">
+    <ul class="navbar__ul">
+      {{#each menuItems}}
+      <li class="menu-item {{#if this.active}}active{{else}}inactive{{/if}}">
+        <a href="{{this.link}}">{{this.label}}</a>
+      </li>
+      {{/each}}
+    </ul>
+  </nav>
+</div>

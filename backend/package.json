@@ -12,7 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.19.2",
-    "mongoose": "^8.3.0"
+    "express-handlebars": "^7.1.2",
+    "mongoose": "^8.3.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

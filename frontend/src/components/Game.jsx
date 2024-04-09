@@ -2,13 +2,7 @@ import React, { useEffect, useState } from 'react';
 import GuessInput from './GuessInput';
 import BoardGrid from './BoardGrid';
 
-export default function Game({
-  gameId,
-  selectedLength,
-  setSelectedLength,
-  uniqueLetters,
-  setUniqueLetters,
-}) {
+export default function Game({ gameId, selectedLength, uniqueLetters }) {
   const [gameState, setGameState] = useState('playing');
   const [inputText, setInputText] = useState('');
   const [guesses, setGuesses] = useState([]);
@@ -23,6 +17,9 @@ export default function Game({
   });
 
   const handleSubmitGuess = async (inputText) => {
+    if (gameState === 'won') {
+      return;
+    }
     setInputText('');
 
     const res = await fetch(`/api/games/${gameId}/guesses`, {
@@ -72,14 +69,17 @@ export default function Game({
     setGameState('end');
   };
 
-  useEffect(() => {
-    // Reset game state when selectedLength or uniqueLetters changes
+  const resetGame = () => {
     setGuesses([]);
     setFeedback([]);
     setLetters([]);
     setCurrentRowIndex(0);
     setCurrentAttempt({ attempt: 0 });
     setGameState('playing');
+  };
+
+  useEffect(() => {
+    resetGame();
   }, [selectedLength, uniqueLetters]);
 
   return (
@@ -103,9 +103,12 @@ export default function Game({
             (new Date(result.endTime) - new Date(result.startTime)) / 1000;
           return (
             <div className="game mt-3">
-              <h1 className="m-2 font-bold text-2xl">Congrats!</h1>
+              <h1 className="m-2 font-bold text-2xl text-yellow-500">
+                Congratulations!
+              </h1>
               <p className="font-bold">
-                The correct word was: {guesses.at(-1).guess}
+                The correct word was:{' '}
+                <span className="text-blue-500">{guesses.at(-1).guess}</span>
               </p>
               <p className="font-bold">Guesses: {guesses.length}</p>
               <p className="font-bold">Duration: {duration} seconds</p>

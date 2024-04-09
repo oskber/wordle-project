@@ -8,6 +8,7 @@ const Highscore = mongoose.model('Highscore', {
   id: String,
   startTime: Date,
   endTime: Date,
+  duration: Number,
 });
 
 export { Highscore };

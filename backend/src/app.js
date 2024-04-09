@@ -4,11 +4,75 @@ import { getRandomWord, handleFeedback, handleOnGuess } from './utils.js';
 import { Highscore, Game } from './models.js';
 import * as uuid from 'uuid';
 import fs from 'fs/promises';
+import { engine } from 'express-handlebars';
 
 mongoose.connect('mongodb://127.0.0.1:27017/wordle');
 
 const app = express();
 app.use(express.json());
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set('views', './views');
+
+const MENU = [
+  {
+    label: 'New Game',
+    link: '/',
+  },
+  {
+    label: 'Highscores',
+    link: '/highscores',
+  },
+  {
+    label: 'About',
+    link: '/about',
+  },
+];
+
+async function renderPage(res, page) {
+  const currentPath = page == 'index' ? '/' : `/${page}`;
+
+  res.render(page, {
+    menuItems: MENU.map((item) => {
+      return {
+        active: currentPath == item.link,
+        label: item.label,
+        link: item.link,
+      };
+    }),
+  });
+}
+async function renderHighscore(res, page) {
+  const currentPath = page == 'index' ? '/' : `/${page}`;
+  const highscores = await Highscore.find();
+
+  res.render(page, {
+    menuItems: MENU.map((item) => {
+      return {
+        active: currentPath == item.link,
+        label: item.label,
+        link: item.link,
+      };
+    }),
+    highscores: highscores.map((entry) => {
+      return {
+        ...entry.toObject(),
+      };
+    }),
+  });
+}
+
+app.get('/highscores', async (req, res) => {
+  renderHighscore(res, 'highscores');
+});
+
+app.get('/', async (request, response) => {
+  renderPage(response, 'index');
+});
+
+app.get('/about', async (request, response) => {
+  renderPage(response, 'about');
+});
 
 app.post('/api/games', async (req, res) => {
   const game = {
@@ -49,6 +113,7 @@ app.post('/api/games/:id/guesses', async (req, res) => {
         guesses: game.guesses,
         correct: true,
         feedback,
+        duration: game.endTime - game.startTime,
       });
     } else {
       res.status(201).json({
@@ -65,17 +130,18 @@ app.post('/api/games/:id/guesses', async (req, res) => {
 app.post('/api/games/:id/highscore', async (req, res) => {
   const game = await Game.findOne({ id: req.params.id });
   if (game) {
-    console.log('game: ', game);
     const name = req.body.name;
     const guesses = game.guesses.map((guessObject) =>
       typeof guessObject === 'string' ? guessObject : guessObject.guess
     );
+    const duration = (game.endTime - game.startTime) / 1000;
 
     await game.save();
     const highscoreData = {
       ...game._doc,
       name,
       guesses,
+      duration,
     };
     const highscoreModel = new Highscore(highscoreData);
     await highscoreModel.save();
@@ -100,10 +166,11 @@ app.get('/api/highscores', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-  const html = await fs.readFile('../dist/index.html');
+  const html = await fs.readFile('../frontend/dist/index.html');
   res.type('html').send(html);
 });
 
-app.use('/assets', express.static('../dist/assets'));
+app.use('/assets', express.static('../frontend/dist/assets'));
+app.use(express.static('public'));
 
 export default app;
