@@ -17,7 +17,7 @@ export default function Game({ gameId, selectedLength, uniqueLetters }) {
   });
 
   const handleSubmitGuess = async (inputText) => {
-    if (gameState === 'won') {
+    if (gameState === 'won' || gameState === 'end') {
       return;
     }
     setInputText('');
@@ -146,7 +146,7 @@ export default function Game({ gameId, selectedLength, uniqueLetters }) {
         })()}
       {currentAttempt.attempt > 5 && gameState !== 'won' && (
         <div className="game">
-          <h1>Game over!</h1>
+          <h1 className="m-2 font-bold text-2xl text-yellow-500">Game over!</h1>
           <p>Reset and try again!</p>
           <button
             onClick={() => {
