@@ -16,15 +16,15 @@ app.set('views', './views');
 
 const MENU = [
   {
-    label: 'New Game',
+    label: 'NEW GAME',
     link: '/',
   },
   {
-    label: 'Highscores',
+    label: 'HIGHSCORES',
     link: '/highscores',
   },
   {
-    label: 'About',
+    label: 'ABOUT',
     link: '/about',
   },
 ];
@@ -114,6 +114,7 @@ app.post('/api/games/:id/guesses', async (req, res) => {
         correct: true,
         feedback,
         duration: game.endTime - game.startTime,
+        attempts: game.attempts,
       });
     } else {
       res.status(201).json({

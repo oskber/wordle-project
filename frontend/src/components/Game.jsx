@@ -136,7 +136,7 @@ export default function Game({ gameId, selectedLength, uniqueLetters }) {
               </div>
               <button
                 onClick={() => {
-                  window.location.reload();
+                  resetGame();
                 }}
                 className="select-none rounded bg-yellow-500 m-2 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-yellow-500/20 transition-all hover:shadow-lg hover:shadow-yellow-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-yellow-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none">
                 reset
@@ -144,25 +144,29 @@ export default function Game({ gameId, selectedLength, uniqueLetters }) {
             </div>
           );
         })()}
-      {currentAttempt.attempt > 5 && gameState !== 'won' && (
-        <div className="game">
-          <h1 className="m-2 font-bold text-2xl text-yellow-500">Game over!</h1>
-          <p>Reset and try again!</p>
-          <button
-            onClick={() => {
-              window.location.reload();
-            }}
-            className="select-none rounded bg-yellow-500 m-2 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-yellow-500/20 transition-all hover:shadow-lg hover:shadow-yellow-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-yellow-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none">
-            reset
-          </button>
-        </div>
-      )}
+      {currentAttempt.attempt >= 6 &&
+        gameState !== 'won' &&
+        gameState !== 'end' && (
+          <div className="game">
+            <h1 className="m-2 font-bold text-2xl text-yellow-500">
+              Game over!
+            </h1>
+            <p>Reset and try again!</p>
+            <button
+              onClick={() => {
+                resetGame();
+              }}
+              className="select-none rounded bg-yellow-500 m-2 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-yellow-500/20 transition-all hover:shadow-lg hover:shadow-yellow-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-yellow-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none">
+              reset
+            </button>
+          </div>
+        )}
       {gameState === 'end' && (
         <div className="game">
           <h1>Done!</h1>
           <button
             onClick={() => {
-              window.location.reload();
+              resetGame();
             }}
             className="select-none rounded bg-yellow-500 m-2 py-2 px-4 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-yellow-500/20 transition-all hover:shadow-lg hover:shadow-yellow-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none peer-placeholder-shown:pointer-events-none peer-placeholder-shown:bg-yellow-gray-500 peer-placeholder-shown:opacity-50 peer-placeholder-shown:shadow-none">
             reset

@@ -9,6 +9,7 @@ const Highscore = mongoose.model('Highscore', {
   startTime: Date,
   endTime: Date,
   duration: Number,
+  attempts: Number,
 });
 
 export { Highscore };

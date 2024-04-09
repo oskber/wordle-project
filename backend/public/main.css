@@ -9,7 +9,8 @@
 }
 
 .navbar {
-  background-color: #000000;
+  background-color: #ffffff;
+  border-bottom: #000000 1px solid;
   height: 5rem;
   min-width: 100%;
   display: flex;
@@ -19,12 +20,12 @@
 
 .navbar__ul {
   display: flex;
-  gap: 2rem;
+  gap: 4rem;
 }
 
 nav li {
   list-style-type: none;
-  color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
 }
 
 nav li a {
@@ -86,6 +87,15 @@ td {
 
 section {
   margin: 50px;
+}
+
+.about__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  width: 400px;
 }
 
 ::-webkit-scrollbar {

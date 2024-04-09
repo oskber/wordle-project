@@ -6,6 +6,8 @@
         <tr>
           <th>Name</th>
           <th>Duration</th>
+          <th>Attempts</th>
+          <th>Unique Letters</th>
           <th>Start Time</th>
           <th>End Time</th>
         </tr>
@@ -19,6 +21,8 @@
         <tr>
           <td>{{this.name}}</td>
           <td>{{this.duration}} seconds</td>
+          <td>{{this.attempts}} attempts</td>
+          <td>{{#if this.uniqueLetters}}Yes{{else}}No{{/if}}</td>
           <td>{{this.startTime}}</td>
           <td>{{this.endTime}}</td>
         </tr>
