@@ -87,7 +87,7 @@ th {
   padding: 20px 15px;
   text-align: left;
   font-weight: 400;
-  font-size: 12px;
+  font-size: 1rem;
   color: #ffffff;
   text-transform: uppercase;
 }
@@ -96,7 +96,7 @@ td {
   text-align: left;
   vertical-align: middle;
   font-weight: 500;
-  font-size: 12px;
+  font-size: 1rem;
   color: #000000;
   border-bottom: solid 1px rgba(0, 0, 0, 0.1);
 }
@@ -113,7 +113,6 @@ section {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 3rem;
   width: 400px;
 }
 
