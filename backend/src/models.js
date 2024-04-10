@@ -23,6 +23,7 @@ const Game = mongoose.model('Game', {
   id: String,
   startTime: Date,
   endTime: Date,
+  duration: Number,
 });
 
 export { Game };

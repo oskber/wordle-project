@@ -42,9 +42,20 @@ async function renderPage(res, page) {
     }),
   });
 }
-async function renderHighscore(res, page) {
+
+const sortOptions = {
+  name: 'name',
+  duration: 'duration',
+  attempts: 'attempts',
+  unique: 'uniqueLetters',
+};
+
+async function renderHighscore(res, page, req) {
   const currentPath = page == 'index' ? '/' : `/${page}`;
-  const highscores = await Highscore.find();
+  const sort = sortOptions[req.query.sort];
+  const highscores = await Highscore.find()
+    .collation({ locale: 'en' })
+    .sort({ [sort]: 1 });
 
   res.render(page, {
     menuItems: MENU.map((item) => {
@@ -63,7 +74,7 @@ async function renderHighscore(res, page) {
 }
 
 app.get('/highscores', async (req, res) => {
-  renderHighscore(res, 'highscores');
+  renderHighscore(res, 'highscores', req);
 });
 
 app.get('/', async (request, response) => {
@@ -107,13 +118,14 @@ app.post('/api/games/:id/guesses', async (req, res) => {
 
     if (guess === game.correctWord) {
       game.endTime = new Date();
+      game.duration = (game.endTime - game.startTime) / 1000;
       await game.save();
       res.status(201).json({
         result: game,
         guesses: game.guesses,
         correct: true,
         feedback,
-        duration: game.endTime - game.startTime,
+        duration: game.duration,
         attempts: game.attempts,
       });
     } else {
@@ -135,7 +147,7 @@ app.post('/api/games/:id/highscore', async (req, res) => {
     const guesses = game.guesses.map((guessObject) =>
       typeof guessObject === 'string' ? guessObject : guessObject.guess
     );
-    const duration = (game.endTime - game.startTime) / 1000;
+    const duration = game.duration;
 
     await game.save();
     const highscoreData = {
@@ -155,15 +167,7 @@ app.post('/api/games/:id/highscore', async (req, res) => {
 
 app.get('/api/highscores', async (req, res) => {
   const highscores = await Highscore.find();
-  res.json({
-    highscores: highscores.map((entry) => ({
-      ...entry,
-      duration: entry.endTime
-        ? new Date(entry.endTime).getTime() -
-          new Date(entry.startTime).getTime()
-        : 0,
-    })),
-  });
+  res.json({ highscores });
 });
 
 app.get('/', async (req, res) => {
