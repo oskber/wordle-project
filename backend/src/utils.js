@@ -48,20 +48,3 @@ async function handleFeedback(guesses, correctWord) {
 }
 
 export { handleFeedback };
-
-async function handleOnGuess(guesses) {
-  const payload = await fs.readFile('./data/words_dictionary.json');
-  const data = JSON.parse(payload.toString());
-  let words = data.words;
-
-  const letters = [];
-  words.map((word) => word);
-  if (guesses.match(/[A-Z]/) && words.includes(guesses)) {
-    letters.push(guesses.map((letter) => letter.toUpperCase()));
-    return letters;
-  } else {
-    return alert('Please enter a valid letter');
-  }
-}
-
-export { handleOnGuess };

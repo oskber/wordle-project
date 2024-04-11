@@ -6,9 +6,14 @@ export default function GuessInput({
 }) {
   const handleSubmit = (ev) => {
     ev.preventDefault();
-    if (inputText.length < selectedLength || inputText.length > selectedLength)
+    if (
+      inputText.length !== selectedLength ||
+      !inputText.match(/^[A-Za-z]+$/)
+    ) {
       return;
-    handleSubmitGuess(inputText);
+    } else {
+      handleSubmitGuess(inputText);
+    }
   };
   return (
     <div className="flex flex-row justify-center items-center gap-1 mb-3">

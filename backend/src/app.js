@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { getRandomWord, handleFeedback, handleOnGuess } from './utils.js';
+import { getRandomWord, handleFeedback } from './utils.js';
 import { Highscore, Game } from './models.js';
 import * as uuid from 'uuid';
 import fs from 'fs/promises';
