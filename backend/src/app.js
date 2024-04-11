@@ -171,11 +171,11 @@ app.get('/api/highscores', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-  const html = await fs.readFile('../frontend/dist/index.html');
+  const html = await fs.readFile('../backend/dist/index.html');
   res.type('html').send(html);
 });
 
-app.use('/assets', express.static('../frontend/dist/assets'));
+app.use('/assets', express.static('../backend/dist/assets'));
 app.use(express.static('public'));
 
 export default app;
