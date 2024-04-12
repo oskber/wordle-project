@@ -99,7 +99,6 @@ app.post('/api/games', async (req, res) => {
     length: req.body.length,
     id: uuid.v4(),
   };
-  console.log('game: ', game);
   const gameModel = new Game(game);
   await gameModel.save();
 
@@ -163,7 +162,6 @@ app.post('/api/games/:id/highscore', async (req, res) => {
     };
     const highscoreModel = new Highscore(highscoreData);
     await highscoreModel.save();
-    console.log('highscoreData: ', highscoreData);
     res.status(201).json({ highscore: highscoreData });
   } else {
     res.status(404).end();
