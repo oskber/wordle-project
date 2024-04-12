@@ -123,7 +123,7 @@ section {
   color: #000000;
   text-transform: uppercase;
   font-weight: 700;
-  text-align: center;
+
   margin: 1.25rem;
 }
 .about__container h2 {
@@ -137,7 +137,8 @@ section {
 .about__container li {
   list-style: disc;
 }
-.about__container {
+
+.about__container p {
   text-align: center;
 }
 
