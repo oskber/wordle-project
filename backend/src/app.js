@@ -5,6 +5,7 @@ import { Highscore, Game } from './models.js';
 import * as uuid from 'uuid';
 import fs from 'fs/promises';
 import { engine } from 'express-handlebars';
+import Handlebars from 'handlebars';
 
 mongoose.connect('mongodb://127.0.0.1:27017/wordle');
 
@@ -42,6 +43,10 @@ async function renderPage(res, page) {
     }),
   });
 }
+
+Handlebars.registerHelper('formatDate', function (date) {
+  return date.toLocaleString();
+});
 
 const sortOptions = {
   name: 'name',

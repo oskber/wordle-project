@@ -9,7 +9,7 @@
     <option value="unique">Unique Letters</option>
   </select>
   <div class="tbl-header">
-    <table cellpadding="0" cellspacing="0" border="0">
+    <table>
       <thead>
         <tr>
           <th>Name</th>
@@ -23,7 +23,7 @@
     </table>
   </div>
   <div class="tbl-content">
-    <table cellpadding="0" cellspacing="0" border="0">
+    <table>
       <tbody>
         {{#each highscores}}
         <tr>
@@ -31,8 +31,8 @@
           <td>{{this.duration}} seconds</td>
           <td>{{this.attempts}} attempts</td>
           <td>{{#if this.uniqueLetters}}Yes{{else}}No{{/if}}</td>
-          <td>{{this.startTime}}</td>
-          <td>{{this.endTime}}</td>
+          <td>{{formatDate this.startTime}}</td>
+          <td>{{formatDate this.endTime}}</td>
         </tr>
         {{/each}}
       </tbody>
